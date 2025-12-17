@@ -12,8 +12,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { RoadmapResponse } from '@/lib/types';
 import MindMapNode from './MindMapNode';
-import { getSnakeLayout } from '@/lib/snakeLayout';
-import { Download } from 'lucide-react';
+import { getHorizontalLayout } from '@/lib/horizontalLayout';
+import { Download, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 const nodeTypes = {
@@ -30,8 +30,8 @@ function RoadmapFlow({ data }: RoadmapViewProps) {
 
     useEffect(() => {
         if (data && data.root) {
-            // Use the new Snake Layout engine
-            const { nodes: layoutedNodes, edges: layoutedEdges } = getSnakeLayout(data.root);
+            // Use the new Horizontal Layout engine
+            const { nodes: layoutedNodes, edges: layoutedEdges } = getHorizontalLayout(data.root);
 
             setNodes(layoutedNodes);
             setEdges(layoutedEdges);

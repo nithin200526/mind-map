@@ -11,44 +11,45 @@ const SIMILAR_ROLES: Record<string, string[]> = {
 
 // 3. Local AI (Ollama) Logic
 async function generateOllamaRoadmap(role: string): Promise<RoadmapResponse> {
+    const prompt = `
       You are a career expert. 
       Review the job title: "${role}".
 
       CRITICAL VALIDATION STEP:
-    1. Is this a REAL, SPECIFIC career or hobby ? (e.g. "Software Engineer" = YES, "Pilot" = YES)
-    2. Is it nonsense, random gibberish, or just keyboard smashing ? (e.g. "Dcjknscjd" = NO, "asdf" = NO)
+      1. Is this a REAL, SPECIFIC career or hobby? (e.g. "Software Engineer" = YES, "Pilot" = YES)
+      2. Is it nonsense, random gibberish, or just keyboard smashing? (e.g. "Dcjknscjd" = NO, "asdf" = NO)
       
-      IF "NO"(It is nonsense):
+      IF "NO" (It is nonsense):
       Return STRICT JSON: { "error": "Invalid role. Please enter a real job title." }
       
-      IF "YES"(It is a real role):
+      IF "YES" (It is a real role):
       Create a simplified career roadmap in this STRICT JSON format:
-    {
+      {
         "role": "${role}",
-            "root": {
-            "id": "root",
-                "label": "${role} Roadmap",
-                    "duration": "Duration",
-                        "children": [
-                            {
-                                "id": "p1",
-                                "label": "Phase 1: Foundations",
-                                "duration": "1 Month",
-                                "children": [
-                                    { "id": "t1", "label": "Key Concept", "duration": "1 Week" }
-                                ]
-                            },
-                            {
-                                "id": "p2",
-                                "label": "Phase 2: Mastery",
-                                "duration": "2 Months",
-                                "children": [
-                                    { "id": "t2", "label": "Advanced Skills", "duration": "2 Weeks" }
-                                ]
-                            }
-                        ]
+        "root": {
+          "id": "root",
+          "label": "${role} Roadmap",
+          "duration": "Duration",
+          "children": [
+            {
+              "id": "p1",
+              "label": "Phase 1: Foundations",
+              "duration": "1 Month",
+              "children": [
+                 { "id": "t1", "label": "Key Concept", "duration": "1 Week" }
+              ]
+            },
+            {
+              "id": "p2",
+              "label": "Phase 2: Mastery",
+              "duration": "2 Months",
+              "children": [
+                 { "id": "t2", "label": "Advanced Skills", "duration": "2 Weeks" }
+              ]
+            }
+          ]
         }
-    }
+      }
     `;
 
     try {
@@ -65,7 +66,7 @@ async function generateOllamaRoadmap(role: string): Promise<RoadmapResponse> {
         });
 
         if (!response.ok) {
-            throw new Error(`Ollama API Error: ${ response.statusText } `);
+            throw new Error(`Ollama API Error: ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -97,54 +98,53 @@ async function generateGeminiRoadmap(apiKey: string, role: string): Promise<Road
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const prompt = `
-      You are a career expert.I will give you a job title: "${role}".
+      You are a career expert. I will give you a job title: "${role}".
       
       VALIDATION STEP:
-    1. Is "${role}" a real, recognized career or hobby ?
-        2. Is it a coherent string(not random letters like "asdf" or "iiii") ?
+      1. Is "${role}" a real, recognized career or hobby?
+      2. Is it a coherent string (not random letters like "asdf" or "iiii")?
 
-            IF NO: Return JSON: { "error": "Unknown or invalid role. Please try a specific job title." }
+      IF NO: Return JSON: { "error": "Unknown or invalid role. Please try a specific job title." }
       
       IF YES: Create a detailed career roadmap.
       Return ONLY valid JSON.
-        Structure:
-    {
+      Structure:
+      {
         "role": "${role}",
-            "root": {
-            "id": "root",
-                "label": "${role} Roadmap",
-                    "duration": "Duration Estimate",
-                        "children": [
-                            {
-                                "id": "unique_id",
-                                "label": "Phase Name",
-                                "duration": "Duration",
-                                "children": [
-                                    {
-                                        "id": "subtask_id",
-                                        "label": "Subtask Name",
-                                        "duration": "Duration"
-                                    }
-                                ]
-                            }
-                        ]
+        "root": {
+          "id": "root",
+          "label": "${role} Roadmap",
+          "duration": "Duration Estimate",
+          "children": [
+            {
+              "id": "unique_id",
+              "label": "Phase Name",
+              "duration": "Duration",
+              "children": [
+                {
+                  "id": "subtask_id",
+                  "label": "Subtask Name",
+                  "duration": "Duration"
+                }
+              ]
+            }
+          ]
         }
-    }
-      Ensure there are at least 3 main phases(Foundations, Advanced, Mastery) and 3 subtasks each.
+      }
+      Ensure there are at least 3 main phases (Foundations, Advanced, Mastery) and 3 subtasks each.
     `;
 
     try {
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text().replace(/```json / g, '').replace(/```/g, '').trim();
-    return JSON.parse(text);
-} catch (error) {
-    console.error("Gemini Critical Error:", error);
-    throw error;
+        // Fix regex issue here
+        const text = response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(text);
+    } catch (error) {
+        console.error("Gemini Critical Error:", error);
+        throw error;
+    }
 }
-}
-
-
 
 export async function generateRoadmap(role: string): Promise<RoadmapResponse & { suggestions?: string[]; error?: string }> {
     const cleanRole = role.toLowerCase().trim();
