@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Premium Gold Palette */
+  --color-brand-gold: #D4AF37;
+  --color-brand-gold-light: #F3E5AB;
+  --color-brand-gold-dark: #AA8C2C;
+  --color-brand-cream: #FAFAF5;
+  --color-brand-charcoal: #2C2C2C;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shine: shine 3s linear infinite;
+}
+
+:root {
+  --background: #FAFAF5;
+  /* Cream/White */
+  --foreground: #2C2C2C;
+  /* Charcoal */
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    background-image:
+      radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 60%),
+      radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.05) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(200, 200, 200, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl bg-white/40 border border-white/60 shadow-xl;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-white/70 border border-white/50 shadow-lg hover:shadow-xl hover:border-[#D4AF37]/40 transition-all duration-300;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#AA8C2C] via-[#D4AF37] to-[#8a7018];
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#AA8C2C] via-[#D4AF37] to-[#8a7018];
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% center;
+  }
+
+  100% {
+    background-position: -200% center;
+  }
+}
