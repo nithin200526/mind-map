@@ -29,14 +29,14 @@ export default function Home() {
       const result = await res.json();
 
       if (result.error) {
-        alert(`AI Message: ${result.error}`);
+        setError(`AI Message: ${result.error}`);
         setData(null);
       } else {
         setData(result);
       }
     } catch (error) {
       console.error('Error fetching roadmap:', error);
-      alert("Failed to generate roadmap. Please check your connection.");
+      setError("Failed to generate roadmap. Please check your connection or try again later.");
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,37 @@ export default function Home() {
 
         <AnimatePresence mode="wait">
           {!data && !loading && (
-            <Hero key="hero" onSearch={handleSearch} isLoading={loading} />
+            <>
+              <Hero key="hero" onSearch={handleSearch} isLoading={loading} />
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`absolute top-24 z-50 px-6 py-4 rounded-xl border shadow-xl flex flex-col gap-2 max-w-lg text-center ${error.includes("Ollama") ? "bg-slate-900 text-white border-slate-700" : "bg-red-50 text-red-600 border-red-200"}`}
+                >
+                  {error.includes("Ollama") ? (
+                    <>
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                        <h3 className="font-bold text-lg">Offline Model Disconnected</h3>
+                      </div>
+                      <p className="text-slate-300 text-sm mb-4">To use the unlimited integration, you must run the local AI engine.</p>
+                      <div className="bg-black/50 p-3 rounded-lg text-left font-mono text-xs text-green-400 mb-2">
+                        $ ollama run llama3
+                      </div>
+                      <a href="https://ollama.com" target="_blank" className="bg-[#D4AF37] text-slate-900 font-bold py-2 rounded-lg hover:bg-[#AA8C2C] transition-colors">
+                        Download Ollama Engine
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold block mb-1">Error</span>
+                      <span>{error}</span>
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </>
           )}
 
           {loading && (
